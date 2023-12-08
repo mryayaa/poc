@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Page</title>
+    <title>Product Page with PayPal Checkout</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,6 +24,8 @@
             cursor: pointer;
         }
     </style>
+    <!-- Include PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID"></script>
 </head>
 <body>
 
@@ -31,14 +33,29 @@
     <h2>Product Name</h2>
     <p>Description of the product goes here.</p>
     <p>Price: $19.99</p>
-    <button onclick="addToCart()">Add to Cart</button>
+    <!-- PayPal Checkout Button Container -->
+    <div id="paypal-button-container"></div>
 </div>
 
 <script>
-    function addToCart() {
-        alert('Product added to cart!');
-        // You can add more logic here to handle the addition to the cart.
-    }
+    // PayPal Checkout Button Script
+    paypal.Buttons({
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: '19.99' // Replace with the actual price
+                    }
+                }]
+            });
+        },
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                alert('Transaction completed by ' + details.payer.name.given_name);
+                // You can add more logic here, like updating the server with the transaction details.
+            });
+        }
+    }).render('#paypal-button-container');
 </script>
 
 </body>
